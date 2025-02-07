@@ -119,10 +119,10 @@ export default function PDFFileUpload({
           </div>
         </div>
       ) : (
-        <UploadButton
+        <UploadDropzone
           className="ut-allowed-content:hidden"
           endpoint={endpoint}
-          onClientUploadComplete={(res) => {
+          onClientUploadComplete={(res: any) => {
             const item = res[0];
             const url = {
               url: item.url,
@@ -135,7 +135,7 @@ export default function PDFFileUpload({
             console.log(res);
             console.log("Upload Completed");
           }}
-          onUploadError={(error) => {
+          onUploadError={(error: any) => {
             toast.error("File Upload Failed, Try Again");
             console.log(`ERROR! ${error.message}`, error);
           }}
