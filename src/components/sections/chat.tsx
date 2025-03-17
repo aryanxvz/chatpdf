@@ -3,9 +3,10 @@
 import { scrollToBottom, initialMessages, getSources } from "@/lib/utils";
 import { useChat, Message } from "ai/react";
 import { useEffect, useRef } from "react";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
 import { ChatLine } from "./chat-bubble";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 export function Chat() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -27,7 +28,7 @@ export function Chat() {
             role={role}
             content={content}
             // Start from the third message of the assistant
-            sources={data?.length ? getSources(data, role, index) : []}
+            sources={[]}
           />
         ))}
       </div>
@@ -40,9 +41,15 @@ export function Chat() {
           className="mr-2"
         />
 
-        <Button type="submit" className="w-24">
-          "Ask"
-        </Button>
+        {isLoading ? (
+          <Button disabled>
+            <Loader2 className="animate-spin" />
+          </Button>
+        ) : (
+          <Button type="submit" className="w-24">
+            Ask
+          </Button>
+        )}
       </form>
     </div>
   );
