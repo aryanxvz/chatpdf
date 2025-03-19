@@ -20,12 +20,14 @@ type PDFUploadInputProps = {
   className?: string;
   endpoint?: any;
 };
+
 export type FileProps = {
   title: string;
   type: string;
   size: number;
   url: string;
 };
+
 export function getFileIcon(extension: string | undefined) {
   switch (extension) {
     case "pdf":
@@ -64,6 +66,7 @@ export function getFileIcon(extension: string | undefined) {
       return <FaFileAlt className="w-6 h-6 flex-shrink-0 mr-2 text-gray-500" />; // Default icon for other file types
   }
 }
+
 export default function PDFFileUpload({
   label,
   file,
