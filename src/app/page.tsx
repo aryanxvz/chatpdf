@@ -42,7 +42,7 @@ export default function Page() {
   return (
     <div>
       <div className="flex flex-1 py-16">
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full max-w-xs md:max-w-xl lg:max-w-2xl mx-auto dark:bg-neutral-900 dark:border-gray-400 dark:border dark:border-dotted dark:rounded-md">
           {error && (
             <Alert variant="destructive" className="mb-4">
               <AlertCircle className="h-4 w-4" />
