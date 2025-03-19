@@ -41,7 +41,7 @@ export default function Page() {
   }
   
   return (
-    <div className="relative flex min-h-[50rem] w-full items-center justify-center bg-white dark:bg-black">
+    <div className="relative flex min-h-[54rem] w-full items-center justify-center bg-white dark:bg-black">
       {/* Grid background */}
       <div
         className={cn(
@@ -55,12 +55,18 @@ export default function Page() {
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
       
       {/* Title */}
-      <p className="absolute top-12 left-0 right-0 text-center z-20 bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text py-8 text-4xl font-bold text-transparent sm:text-7xl">
+      <p className="absolute top-12 2xl:top-16 left-0 right-0 text-center z-20 bg-gradient-to-b from-neutral-400 to-neutral-900 dark:bg-gradient-to-b dark:from-neutral-400 dark:to-neutral-50 bg-clip-text py-8 text-6xl font-bold text-transparent sm:text-7xl">
         chatpdf
+      </p>
+      <p className="absolute top-40 2xl:top-44 pt-3 left-0 right-0 text-center z-20 bg-gradient-to-b from-neutral-400 to-neutral-900 dark:bg-gradient-to-b dark:from-neutral-400 dark:to-neutral-50 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+        decoding documents effortlessly
+      </p>
+      <p className="absolute top-56 2xl:top-60 md:pt-0 pt-10 left-0 right-0 text-center z-20 bg-gradient-to-b from-neutral-400 to-neutral-900 dark:bg-gradient-to-b dark:from-neutral-400 dark:to-neutral-50 bg-clip-text text-xl font-bold text-transparent sm:text-2xl">
+        Upload - Ask - Discover
       </p>
       
       {/* Content */}
-      <div className="flex flex-1 py-16 z-10 relative">
+      <div className="flex flex-1 py-8 md:py-0 z-10 relative">
         <div className="w-full max-w-xs md:max-w-xl lg:max-w-2xl mx-auto dark:bg-neutral-900/80 dark:border-gray-400 dark:border dark:border-dotted dark:rounded-md bg-white/80 border border-gray-200 border-dotted rounded-md shadow-lg backdrop-blur-sm">
           {error && (
             <Alert variant="destructive" className="mb-4">
@@ -102,6 +108,12 @@ export default function Page() {
           )}
         </div>
       </div>
+      <p className="absolute bottom-[270px] left-0 right-0 text-center z-20 bg-gradient-to-b from-neutral-400 to-neutral-900 dark:bg-gradient-to-b dark:from-neutral-400 dark:to-neutral-50 bg-clip-text text-base font-bold text-transparent sm:text-lg">
+        Upload your PDF to get started
+      </p>
+      <p className="absolute bottom-[245px] left-0 right-0 text-center z-20 bg-gradient-to-b from-neutral-400 to-neutral-900 dark:bg-gradient-to-b dark:from-neutral-400 dark:to-neutral-50 bg-clip-text text-sm font-bold text-transparent sm:text-base">
+        Size limit - 16MB
+      </p>
     </div>
   );
 }
