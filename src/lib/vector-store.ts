@@ -41,3 +41,18 @@ export async function getVectorStore(client: PineconeClient) {
     throw new Error("Something went wrong while getting vector store !");
   }
 }
+
+export async function clearPineconeIndex(client: PineconeClient) {
+  try {
+    const index = client.Index(env.PINECONE_INDEX_NAME);
+    
+    // Since you're not using namespaces explicitly in your embedAndStoreDocs function,
+    // we'll delete all vectors in the index
+    await index.deleteAll();
+    
+    console.log("Successfully cleared Pinecone index");
+  } catch (error) {
+    console.log("Error clearing Pinecone index:", error);
+    throw new Error("Failed to clear existing data!");
+  }
+}
