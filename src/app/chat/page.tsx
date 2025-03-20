@@ -1,4 +1,3 @@
-// page.tsx:
 "use client";
 import { Chat } from "@/components/sections/chat";
 import { cn } from "@/lib/utils";
@@ -19,7 +18,7 @@ export default function ChatPage() {
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
       
       {/* Chat Container */}
-      <div className="flex flex-1 py-20 z-10 relative w-full max-w-6xl 2xl:max-w-7xl px-6 md:px-8">
+      <div className="flex flex-1 py-16 2xl:py-20 z-10 relative w-full max-w-6xl 2xl:max-w-7xl px-6 md:px-8">
         <Chat />
       </div>
     </div>
