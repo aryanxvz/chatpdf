@@ -21,7 +21,7 @@ export function Chat() {
   }, [messages]);
 
   return (
-    <div className="w-full dark:bg-neutral-900/80 dark:border-gray-400 dark:border dark:border-dotted dark:rounded-md bg-white/80 border border-gray-200 border-dotted rounded-md shadow-lg backdrop-blur-sm flex flex-col h-[65vh]">
+    <div className="w-full dark:bg-neutral-900/80 dark:border-gray-400 dark:border dark:border-dotted dark:rounded-md bg-white/80 border border-gray-200 border-dotted rounded-md shadow-lg backdrop-blur-sm flex flex-col h-[65vh] 2xl:h-[75vh]">
       <div 
         className="p-6 overflow-auto flex-1" 
         ref={containerRef}
