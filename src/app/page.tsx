@@ -71,7 +71,7 @@ export default function Page() {
       </p>
       
       {/* Content */}
-      <div className="flex flex-1 py-8 md:py-0 z-10 relative -top-10 cursor-pointer">
+      <div className="flex flex-1 py-8 md:py-0 z-10 relative -top-4 lg:-top-10 cursor-pointer">
         <div className="w-full max-w-xs md:max-w-xl lg:max-w-2xl mx-auto dark:bg-neutral-900/80 dark:border-gray-400 dark:border dark:border-dotted dark:rounded-md bg-white/80 border border-gray-200 border-dotted rounded-md shadow-lg backdrop-blur-sm">
           {error && (
             <Alert variant="destructive" className="mb-4">
