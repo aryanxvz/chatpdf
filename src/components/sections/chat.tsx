@@ -98,20 +98,20 @@ export function Chat() {
             type="submit" 
             size="icon" 
             disabled={isLoading || !input.trim()}
-            className="flex-shrink-0"
+            className="flex-shrink-0 group"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Send className="h-4 w-4" />
+              <Send className="h-4 w-4 group-hover:scale-110 transition-all duration-300" />
             )}
           </Button>
         </form>
         
         <div className="mt-4 flex justify-center">
           <Link href="/">
-            <Button variant="outline" className="text-sm flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
+            <Button variant="outline" className="text-sm group flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-all" />
               Try another PDF
             </Button>
           </Link>
