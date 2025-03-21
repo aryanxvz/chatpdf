@@ -6,8 +6,7 @@ import { Document } from "@langchain/core/documents";
 
 export async function embedAndStoreDocs(
   client: PineconeClient,
-  // Using proper typing for the docs
-  docs: Document<Record<string, unknown>>[]
+  docs: Document[]
 ) {
   /*create and store the embeddings in the vectorStore*/
   try {
