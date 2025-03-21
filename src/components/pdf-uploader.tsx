@@ -12,14 +12,7 @@ import {
   FaFileAlt,
 } from "react-icons/fa";
 import { MdTextSnippet } from "react-icons/md"; // For .txt files
-
-type PDFUploadInputProps = {
-  label: string;
-  file: FileProps | null;
-  setFile: any;
-  className?: string;
-  endpoint?: any;
-};
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 export type FileProps = {
   title: string;
@@ -27,6 +20,22 @@ export type FileProps = {
   size: number;
   url: string;
 };
+
+type PDFUploadInputProps = {
+  label: string;
+  file: FileProps | null;
+  setFile: React.Dispatch<React.SetStateAction<FileProps | null>>;
+  className?: string;
+  endpoint: keyof OurFileRouter;
+};
+
+// Define the upload response type based on what the library returns
+interface UploadResponse {
+  url: string;
+  name: string;
+  size: number;
+  type: string;
+}
 
 export function getFileIcon(extension: string | undefined) {
   switch (extension) {
@@ -68,11 +77,10 @@ export function getFileIcon(extension: string | undefined) {
 }
 
 export default function PDFFileUpload({
-  label,
   file,
   setFile,
   className = "col-span-full",
-  endpoint = "",
+  endpoint,
 }: PDFUploadInputProps) {
   function handleImageRemove() {
     setFile(null);
@@ -119,20 +127,22 @@ export default function PDFFileUpload({
         <UploadDropzone
           className="ut-allowed-content:hidden"
           endpoint={endpoint}
-          onClientUploadComplete={(res: any) => {
-            const item = res[0];
-            const url = {
-              url: item.url,
-              title: item.name,
-              size: item.size,
-              type: item.type,
-            };
-            setFile(url);
-            console.log(url);
-            console.log(res);
-            console.log("Upload Completed");
+          onClientUploadComplete={(res: UploadResponse[]) => {
+            if (res && res.length > 0) {
+              const item = res[0];
+              const url = {
+                url: item.url,
+                title: item.name,
+                size: item.size,
+                type: item.type,
+              };
+              setFile(url);
+              console.log(url);
+              console.log(res);
+              console.log("Upload Completed");
+            }
           }}
-          onUploadError={(error: any) => {
+          onUploadError={(error: Error) => {
             toast.error("File Upload Failed, Try Again");
             console.log(`ERROR! ${error.message}`, error);
           }}

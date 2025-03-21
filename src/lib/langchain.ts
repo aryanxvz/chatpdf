@@ -10,11 +10,6 @@ interface ProcessMessageArgs {
   model: ChatOpenAI;
 }
 
-interface ProcessMessageResponse {
-  answer: string;
-  inquiry: string;
-}
-
 export async function processUserMessage({
   userPrompt,
   conversationHistory,

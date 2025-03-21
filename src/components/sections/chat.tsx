@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export function Chat() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { messages, input, handleInputChange, handleSubmit, isLoading, data } =
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       initialMessages,
     });
@@ -46,7 +46,7 @@ export function Chat() {
           </div>
         ) : (
           <>
-            {messages.map(({ id, role, content }: Message, index) => (
+            {messages.map(({ id, role, content }: Message) => (
               <ChatLine
                 key={id}
                 role={role}
