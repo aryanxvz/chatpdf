@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Message } from "ai";
+import { LangChainAdapter } from "ai";
 import { getVectorStore } from "@/lib/vector-store";
 import { ChatOpenAI } from "@langchain/openai";
 import { processUserMessage } from "@/lib/langchain";
@@ -12,7 +13,16 @@ export async function POST(req: NextRequest) {
   try {
     // Parse and validate request
     const body = await req.json();
-    const messages: Message[] = body.messages ?? [];
+
+    if (!Array.isArray(body.messages)) {
+      return NextResponse.json(
+        { error: "Invalid request format" },
+        { status: 400 }
+      );
+    }
+
+    const messages: Message[] = body.messages;
+    console.log("Received messages:", JSON.stringify(messages, null, 2));
 
     if (!messages.length) {
       return NextResponse.json(
@@ -20,15 +30,16 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    
-    const currentQuestion = messages[messages.length - 1].content;
-    if (!currentQuestion?.trim()) {
+
+    const currentQuestion = messages[messages.length - 1]?.content;
+
+    if (typeof currentQuestion !== "string" || !currentQuestion.trim()) {
       return NextResponse.json(
-        { error: "Empty question provided" },
+        { error: "Invalid question format" },
         { status: 400 }
       );
     }
-    
+
     // Format conversation history
     const formattedPreviousMessages = messages
       .slice(0, -1)
@@ -43,51 +54,29 @@ export async function POST(req: NextRequest) {
     // Initialize model and vector store
     const model = new ChatOpenAI({
       modelName: "gpt-3.5-turbo",
-      temperature: 0.1,
       streaming: true,
     });
-    
+
     const pc = await getPineconeClient();
     const vectorStore = await getVectorStore(pc);
-    
-    // Get the streaming result from processUserMessage
+
+    console.log("processUserMessage input:", {
+      userPrompt: currentQuestion,
+      conversationHistory: formattedPreviousMessages,
+    });
+
     const stream = await processUserMessage({
       userPrompt: currentQuestion,
       conversationHistory: formattedPreviousMessages,
       vectorStore,
       model,
     });
-    
-    // Create a standard web Response with the stream
-    // This bypasses the LangChainAdapter which might be causing validation issues
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        try {
-          // For LangChain StringOutputParser stream
-          for await (const chunk of stream) {
-            // Create a proper SSE message
-            const data = `data: ${JSON.stringify({ text: chunk })}\n\n`;
-            controller.enqueue(new TextEncoder().encode(data));
-          }
-          // End the stream with a done message
-          controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
-          controller.close();
-        } catch (error) {
-          console.error("Stream processing error:", error);
-          controller.error(error);
-        }
-      },
-    });
-    
-    // Return as a standard Response object
-    return new Response(readableStream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    });
-    
+
+    console.log("message answer =>", stream);
+
+    // Convert the stream using the new adapter
+    const response = LangChainAdapter.toDataStreamResponse(stream);
+    return response;
   } catch (error) {
     console.error("Chat endpoint error:", error);
     return NextResponse.json(
