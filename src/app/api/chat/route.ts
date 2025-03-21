@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Message, LangChainAdapter } from "ai";
+import { Message } from "ai";
 import { getVectorStore } from "@/lib/vector-store";
 import { ChatOpenAI } from "@langchain/openai";
 import { processUserMessage } from "@/lib/langchain";
@@ -12,10 +12,8 @@ export async function POST(req: NextRequest) {
   try {
     // Parse and validate request
     const body = await req.json();
-    
-    // Validate messages array with more robust checking
-    const messages: Message[] = Array.isArray(body.messages) ? body.messages : [];
-    
+    const messages: Message[] = body.messages ?? [];
+
     if (!messages.length) {
       return NextResponse.json(
         { error: "No messages provided" },
@@ -52,8 +50,7 @@ export async function POST(req: NextRequest) {
     const pc = await getPineconeClient();
     const vectorStore = await getVectorStore(pc);
     
-    // Add debugging to see what processUserMessage returns
-    console.log("About to call processUserMessage...");
+    // Get the streaming result from processUserMessage
     const stream = await processUserMessage({
       userPrompt: currentQuestion,
       conversationHistory: formattedPreviousMessages,
@@ -61,19 +58,35 @@ export async function POST(req: NextRequest) {
       model,
     });
     
-    console.log("Stream type:", typeof stream);
-    console.log("Stream is array:", Array.isArray(stream));
-    console.log("Stream prototype:", Object.getPrototypeOf(stream));
+    // Create a standard web Response with the stream
+    // This bypasses the LangChainAdapter which might be causing validation issues
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        try {
+          // For LangChain StringOutputParser stream
+          for await (const chunk of stream) {
+            // Create a proper SSE message
+            const data = `data: ${JSON.stringify({ text: chunk })}\n\n`;
+            controller.enqueue(new TextEncoder().encode(data));
+          }
+          // End the stream with a done message
+          controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
+          controller.close();
+        } catch (error) {
+          console.error("Stream processing error:", error);
+          controller.error(error);
+        }
+      },
+    });
     
-    if (!stream) {
-      return NextResponse.json(
-        { error: "No stream returned from processUserMessage" },
-        { status: 500 }
-      );
-    }
-    
-    // Convert to response using LangChainAdapter
-    return LangChainAdapter.toDataStreamResponse(stream);
+    // Return as a standard Response object
+    return new Response(readableStream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
     
   } catch (error) {
     console.error("Chat endpoint error:", error);
