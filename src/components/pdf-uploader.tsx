@@ -1,4 +1,4 @@
-import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
+import { UploadDropzone } from "@/lib/uploadthing";
 import { Pencil, XCircle } from "lucide-react";
 import React from "react";
 import toast from "react-hot-toast";

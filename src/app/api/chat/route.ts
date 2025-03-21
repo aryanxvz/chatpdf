@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Message, streamText } from "ai";
+import { Message } from "ai";
 import { LangChainAdapter } from "ai";
 import { getVectorStore } from "@/lib/vector-store";
 import { StringOutputParser } from "@langchain/core/output_parsers";

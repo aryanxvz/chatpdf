@@ -1,12 +1,11 @@
 "use client";
-import { scrollToBottom, initialMessages, getSources } from "@/lib/utils";
+import { initialMessages } from "@/lib/utils";
 import { useChat, Message } from "ai/react";
 import { useEffect, useRef } from "react";
 import { Loader2, Send, ArrowLeft } from "lucide-react";
 import { ChatLine } from "./chat-bubble";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export function Chat() {
