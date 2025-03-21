@@ -7,12 +7,14 @@ import { PDFSource } from "@/lib/pdf-loader";
 import { AlertCircle, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [file, setFile] = useState<FileProps | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function submit() {
     try {
@@ -32,6 +34,9 @@ export default function Page() {
       
       await Promise.race([prepare(pdfSource), timeoutPromise]);
       setLoading(false);
+      
+      // Navigate to the chat page after successful upload
+      router.push("/chat");
     } catch (error) {
       setLoading(false);
       setLoadingMsg("");
