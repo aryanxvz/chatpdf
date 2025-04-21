@@ -22,26 +22,50 @@ export default function Page() {
       setError(null);
       setLoadingMsg("Initializing Client and creating index...");
 
+      // Make sure we have a valid URL
+      if (!file?.url) {
+        throw new Error("Invalid file URL. Please try uploading again.");
+      }
+
       const pdfSource: PDFSource = {
         type: "url",
-        source: file?.url ?? "",
+        source: file.url,
       };
+      
+      console.log("Submitting PDF source:", pdfSource);
       
       // Add a timeout to prevent hanging indefinitely
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Request timed out")), 30000); // 30 second timeout
+        setTimeout(() => reject(new Error("Request timed out after 30 seconds")), 30000);
       });
       
-      await Promise.race([prepare(pdfSource), timeoutPromise]);
-      setLoading(false);
+      // Add progress indicators
+      const progressIndicator = setInterval(() => {
+        setLoadingMsg(prev => {
+          if (prev.endsWith("...")) return "Processing PDF";
+          return prev + ".";
+        });
+      }, 1000);
       
-      // Navigate to the chat page after successful upload
-      router.push("/chat");
+      try {
+        await Promise.race([prepare(pdfSource), timeoutPromise]);
+        clearInterval(progressIndicator);
+        setLoading(false);
+        
+        // Navigate to the chat page after successful upload
+        router.push("/chat");
+      } catch (err) {
+        clearInterval(progressIndicator);
+        throw err;
+      }
     } catch (error) {
       setLoading(false);
       setLoadingMsg("");
-      setError(error instanceof Error ? error.message : "An unknown error occurred");
-      console.error(error);
+      
+      // Enhanced error reporting
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error("Error details:", error);
+      setError(`Upload failed: ${errorMessage}`);
     }
   }
   
@@ -72,7 +96,7 @@ export default function Page() {
       
       {/* Content */}
       <div className="flex flex-1 py-8 md:py-0 z-10 relative -top-4 lg:-top-10 cursor-pointer">
-        <div className="w-full max-w-xs md:max-w-xl lg:max-w-2xl mx-auto dark:bg-neutral-900/80 dark:border-gray-400 dark:border dark:border-dotted dark:rounded-md bg-white/80 border border-gray-200 border-dotted rounded-md shadow-lg backdrop-blur-sm">
+        <div className="w-full max-w-xs md:max-w-xl lg:max-w-2xl mx-auto dark:bg-neutral-900/80 dark:border-gray-400 dark:border dark:border-dotted dark:rounded-md bg-white/80 border border-gray-200 border-dotted rounded-md shadow-lg backdrop-blur-sm p-4">
           {error && (
             <Alert variant="destructive" className="mb-4">
               <AlertCircle className="h-4 w-4" />
@@ -81,12 +105,17 @@ export default function Page() {
           )}
           
           {file ? (
-            <>
+            <div className="space-y-4">
+              <div className="p-2 border rounded-md">
+                <p className="font-medium">Selected file:</p>
+                <p className="text-sm truncate">{file.title}</p> {/* Use title instead of name */}
+              </div>
+              
               {loading ? (
-                <Button disabled className="w-full">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {loadingMsg}
-                </Button>
+                <div className="w-full text-center">
+                  <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin" />
+                  <p>{loadingMsg}</p>
+                </div>
               ) : (
                 <Button onClick={() => submit()} className="w-full">
                   Upload to Pinecone
@@ -102,7 +131,7 @@ export default function Page() {
                   Choose a different file
                 </Button>
               )}
-            </>
+            </div>
           ) : (
             <PDFFileUpload
               label=""

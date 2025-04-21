@@ -44,15 +44,31 @@ export async function getVectorStore(client: PineconeClient) {
 
 export async function clearPineconeIndex(client: PineconeClient) {
   try {
+    console.log("Getting index for clearing:", env.PINECONE_INDEX_NAME);
     const index = client.Index(env.PINECONE_INDEX_NAME);
     
-    // Since you're not using namespaces explicitly in your embedAndStoreDocs function,
-    // we'll delete all vectors in the index
-    await index.deleteAll();
-    
-    console.log("Successfully cleared Pinecone index");
+    // Check if index exists first
+    try {
+      const indexStats = await index.describeIndexStats();
+      console.log("Index stats before clearing:", indexStats);
+      
+      // Fix: Handle possible undefined value and provide default of 0
+      const recordCount = indexStats.totalRecordCount ?? 0;
+      
+      if (recordCount > 0) {
+        console.log("Clearing all vectors from index...");
+        await index.deleteAll();
+        console.log("Successfully cleared Pinecone index");
+      } else {
+        console.log("Index is already empty, no need to clear");
+      }
+      return true;
+    } catch (statsError) {
+      console.log("Could not get index stats, proceeding without clearing:", statsError);
+      return false; // Return false rather than throwing
+    }
   } catch (error) {
     console.log("Error clearing Pinecone index:", error);
-    throw new Error("Failed to clear existing data!");
+    return false; // Return false instead of throwing
   }
 }

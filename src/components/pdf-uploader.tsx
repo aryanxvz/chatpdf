@@ -16,6 +16,7 @@ import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 export type FileProps = {
   title: string;
+  name: string;
   type: string;
   size: number;
   url: string;
@@ -130,14 +131,15 @@ export default function PDFFileUpload({
           onClientUploadComplete={(res: UploadResponse[]) => {
             if (res && res.length > 0) {
               const item = res[0];
-              const url = {
+              const fileData = {
                 url: item.url,
                 title: item.name,
+                name: item.name, 
                 size: item.size,
                 type: item.type,
               };
-              setFile(url);
-              console.log(url);
+              setFile(fileData);
+              console.log(fileData);
               console.log(res);
               console.log("Upload Completed");
             }
