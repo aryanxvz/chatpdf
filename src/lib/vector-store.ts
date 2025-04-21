@@ -65,7 +65,7 @@ export async function clearPineconeIndex(client: PineconeClient) {
       return true;
     } catch (statsError) {
       console.log("Could not get index stats, proceeding without clearing:", statsError);
-      return false; // Return false rather than throwing
+      return false;
     }
   } catch (error) {
     console.log("Error clearing Pinecone index:", error);
