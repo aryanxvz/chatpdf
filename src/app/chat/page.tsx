@@ -16,21 +16,20 @@ export default function ChatPage() {
         )}
       />
       {/* Radial gradient for the container to give a faded look */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
+      <div className="absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
       
-      {/* Navigation Link */}
-      <div className="absolute top-4 right-4 z-10">
-        <Link 
-          href="/pinecone-records" 
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors shadow-sm"
-        >
-          View Pinecone Records
-        </Link>
-      </div>
-      
-      {/* Chat Container */}
-      <div className="flex flex-1 py-16 z-10 relative w-full max-w-6xl 2xl:max-w-7xl px-6 md:px-8">
-        <Chat />
+      {/* Main content container with max width */}
+      <div className="w-full max-w-6xl 2xl:max-w-7xl px-6 md:px-8 relative">
+        <div className="flex flex-1 py-16 z-10 relative w-full">
+          <Chat />
+        </div>
+
+        <div className="absolute top-5 right-6 md:right-8 z-50">
+          <Link href="/pinecone-records" 
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors shadow-sm">
+            View Pinecone Records
+          </Link>
+        </div>
       </div>
     </div>
   );
