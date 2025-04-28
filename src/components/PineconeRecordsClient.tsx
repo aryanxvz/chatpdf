@@ -1,30 +1,39 @@
-// components/PineconeRecordsClient.tsx
 "use client";
 import { useState } from "react";
 import Link from "next/link";
 
-type PineconeRecord = {
+export type PineconeMetadata = {
+  text: string;
+  "loc.lines.from"?: number;
+  "loc.lines.to"?: number;
+  "loc.pageNumber"?: number;
+  "pdf.info.IsAcroFormPresent"?: boolean;
+  "pdf.info.IsXFAPresent"?: boolean;
+  "pdf.info.PDFFormatVersion"?: string;
+  "pdf.info.Producer"?: string;
+  "pdf.info.Title"?: string;
+  "pdf.totalPages"?: number;
+  "pdf.version"?: string;
+  [key: string]: unknown;
+};
+
+export type PineconeRecord = {
   id: string;
-  metadata: {
-    "loc.lines.from"?: number;
-    "loc.lines.to"?: number;
-    "loc.pageNumber"?: number;
-    "pdf.info.IsAcroFormPresent"?: boolean;
-    "pdf.info.IsXFAPresent"?: boolean;
-    "pdf.info.PDFFormatVersion"?: string;
-    "pdf.info.Producer"?: string;
-    "pdf.info.Title"?: string;
-    "pdf.totalPages"?: number;
-    "pdf.version"?: string;
-    text: string;
-    [key: string]: any;
-  };
+  metadata: PineconeMetadata;
   score?: number;
 };
 
-type InitialData = {
+export type IndexStats = {
+  dimension?: number;
+  totalRecordCount?: number;
+  namespaces?: Record<string, {
+    recordCount?: number;
+  }>;
+};
+
+export type InitialData = {
   success: boolean;
-  stats?: any;
+  stats?: IndexStats;
   records?: PineconeRecord[];
   error?: string;
 };
@@ -134,7 +143,6 @@ export function PineconeRecordsClient({ initialData }: { initialData: InitialDat
               <div className="p-4 bg-white dark:bg-gray-900">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(record.metadata || {}).map(([key, value]) => {
-                    // Special handling for text field
                     if (key === "text") {
                       return (
                         <div key={key} className="md:col-span-2 mt-2">

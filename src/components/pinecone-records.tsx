@@ -1,23 +1,24 @@
-// components/PineconeRecords.tsx
 "use client";
 import { useState, useEffect } from "react";
 
+type PineconeMetadata = {
+  "loc.lines.from"?: number;
+  "loc.lines.to"?: number;
+  "loc.pageNumber"?: number;
+  "pdf.info.IsAcroFormPresent"?: boolean;
+  "pdf.info.IsXFAPresent"?: boolean;
+  "pdf.info.PDFFormatVersion"?: string;
+  "pdf.info.Producer"?: string;
+  "pdf.info.Title"?: string;
+  "pdf.totalPages"?: number;
+  "pdf.version"?: string;
+  text: string;
+  [key: string]: unknown;
+};
+
 type PineconeRecord = {
   id: string;
-  metadata: {
-    "loc.lines.from"?: number;
-    "loc.lines.to"?: number;
-    "loc.pageNumber"?: number;
-    "pdf.info.IsAcroFormPresent"?: boolean;
-    "pdf.info.IsXFAPresent"?: boolean;
-    "pdf.info.PDFFormatVersion"?: string;
-    "pdf.info.Producer"?: string;
-    "pdf.info.Title"?: string;
-    "pdf.totalPages"?: number;
-    "pdf.version"?: string;
-    text: string;
-    [key: string]: any;
-  };
+  metadata: PineconeMetadata;
   score?: number;
 };
 
@@ -28,11 +29,10 @@ export function PineconeRecords() {
   const [expandedRecords, setExpandedRecords] = useState<Set<string>>(new Set());
   const [apiStatus, setApiStatus] = useState<'unchecked' | 'working' | 'failing'>('unchecked');
 
-  // First test the basic API functionality 
+  // Test API connection
   useEffect(() => {
     const testApiConnection = async () => {
       try {
-        // First check if our basic API route is working
         const response = await fetch('/api/test');
         const data = await response.json();
         
@@ -52,26 +52,37 @@ export function PineconeRecords() {
     testApiConnection();
   }, []);
 
-  // Then fetch records if API is working
+  // Fetch records if API is working
   useEffect(() => {
     const fetchRecords = async () => {
       if (apiStatus !== 'working') return;
       
       try {
         setLoading(true);
-        
         const response = await fetch('/api/pinecone-records');
         
         if (!response.ok) {
           throw new Error(`API returned ${response.status}: ${response.statusText}`);
         }
         
-        // Log raw response for debugging
         const responseText = await response.text();
         console.log("Raw API response:", responseText);
         
-        // Parse the response as JSON
-        let data;
+        let data: {
+          success: boolean;
+          stats?: {
+            dimension?: number;
+            totalRecordCount?: number;
+            namespaces?: Record<string, unknown>;
+          };
+          records?: Array<{
+            id: string;
+            metadata: Record<string, unknown>;
+            score?: number;
+          }>;
+          error?: string;
+        };
+        
         try {
           data = JSON.parse(responseText);
         } catch (jsonError) {
@@ -83,16 +94,25 @@ export function PineconeRecords() {
           throw new Error(data.error || "Failed to fetch records");
         }
         
-        // Debug stats
         if (data.stats) {
           console.log("Pinecone stats:", data.stats);
         }
         
-        const fetchedRecords = data.records.map((match: any) => ({
-          id: match.id,
-          metadata: match.metadata || {},
-          score: match.score
-        }));
+        const fetchedRecords = (data.records || []).map((match) => {
+          // Ensure text is always present
+          const text = typeof match.metadata.text === 'string' 
+            ? match.metadata.text 
+            : "";
+            
+          return {
+            id: match.id,
+            metadata: {
+              ...match.metadata,
+              text  // This ensures text is always present and properly typed
+            },
+            score: match.score
+          };
+        });
         
         setRecords(fetchedRecords);
       } catch (err) {
@@ -118,7 +138,6 @@ export function PineconeRecords() {
     });
   };
 
-  // Show API connection status
   if (apiStatus === 'failing') {
     return (
       <div className="p-6 bg-red-50 dark:bg-red-900/20 rounded-lg">
@@ -203,7 +222,6 @@ export function PineconeRecords() {
               <div className="p-4 bg-white dark:bg-gray-900">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(record.metadata || {}).map(([key, value]) => {
-                    // Special handling for text field
                     if (key === "text") {
                       return (
                         <div key={key} className="md:col-span-2 mt-2">

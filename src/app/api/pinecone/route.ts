@@ -39,17 +39,29 @@ export async function GET() {
       });
     } catch (indexError) {
       console.error("Error accessing Pinecone index:", indexError);
+      
+      // Properly handle the unknown error type
+      const errorMessage = indexError instanceof Error 
+        ? indexError.message 
+        : 'Unknown error occurred while accessing Pinecone index';
+      
       return NextResponse.json({ 
         success: false, 
-        error: `Error accessing Pinecone index: ${indexError.message}` 
+        error: `Error accessing Pinecone index: ${errorMessage}` 
       }, { status: 500 });
     }
   } catch (error) {
     console.error("Error in Pinecone records API:", error);
+    
+    // Properly handle the unknown error type
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Unknown error occurred while fetching records';
+    
     return NextResponse.json(
       { 
         success: false, 
-        error: `Failed to fetch records: ${error.message}` 
+        error: `Failed to fetch records: ${errorMessage}` 
       },
       { status: 500 }
     );
